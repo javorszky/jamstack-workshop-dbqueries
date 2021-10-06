@@ -1,7 +1,7 @@
 -- create a table that relates users to users
-create table user_relationships (
-    manager_id uuid references auth.users on delete cascade not null,
-    employee_id uuid references auth.users on delete cascade not null
+create table public.user_relationships (
+    manager_id uuid references public.profiles on delete cascade not null,
+    employee_id uuid references public.profiles on delete cascade not null
 );
 
 -- this will mean we won't insert the same manager/employee pair more than once, and also speeds up lookup by manager (get all employees managed by X)
@@ -37,3 +37,9 @@ create or replace function employee_no_manager()
 CREATE TRIGGER employee_no_manager_trigger
     BEFORE INSERT OR UPDATE ON user_relationships
     FOR EACH ROW EXECUTE PROCEDURE employee_no_manager();
+
+-- drop trigger employee_no_manager_trigger on user_relationships;
+-- drop function public.employee_no_manager;
+
+
+insert into user_relationships (manager_id, employee_id) values ('f88eba36-fdec-42ab-baea-993fcc7777df', '5995b4db-e19f-4f7c-9e55-10151b8a678a');

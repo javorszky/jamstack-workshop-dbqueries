@@ -2,8 +2,8 @@ CREATE TYPE addressType AS ENUM ('shipping', 'billing');
 
 
 create table addresses (
-    id uuid primary key not null,
-    user_id uuid references profiles.id on delete cascade not null,
+    id uuid primary key not null default uuid_generate_v4(),
+    user_id uuid references profiles(id) on delete cascade not null,
     type addressType,
     address1 text,
     address2 text,

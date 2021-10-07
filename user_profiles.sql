@@ -1,4 +1,5 @@
 -- Create a table for Public Profiles
+
 create table profiles (
   id uuid references auth.users not null,
   email text unique not null,
@@ -46,3 +47,17 @@ where p.id = 'f88eba36-fdec-42ab-baea-993fcc7777df' and ur.employee_id is null;
 -- get user and see whether they have anything in the user relationships table
 elect * from public.profiles p left join public.user_relationships ur on p.id = ur.employee_id
 where p.id = 'f88eba36-fdec-42ab-baea-993fcc7777df';-- and ur.employee_id is null;
+
+
+
+
+-- at the end if we try to delete a user from the auth.users table, it will fail because there's a foreign key constraint on another table, which means the other data says "part of my data needs to exist someplace else!", and if we delete the data from "someplace else", then that requirement will fail.
+
+-- to fix that, we need to add the "on delete cascade" part to the reference
+begin;
+alter table profiles
+drop constraint profiles_id_fkey;
+
+alter table profiles
+add constraint profiles_id_fkey foreign key (id) references auth.users(id) on delete cascade;
+commit;

@@ -41,5 +41,28 @@ CREATE TRIGGER employee_no_manager_trigger
 -- drop trigger employee_no_manager_trigger on user_relationships;
 -- drop function public.employee_no_manager;
 
-
+-- this one creates a faux relationship.
 insert into user_relationships (manager_id, employee_id) values ('f88eba36-fdec-42ab-baea-993fcc7777df', '5995b4db-e19f-4f7c-9e55-10151b8a678a');
+
+
+-- this one creates a function that we can then call with await supabase.rpc('public.is_employee', {uid: uid})
+create or replace function public.is_employee(uid uuid)
+returns boolean
+language plpgsql
+as
+$$
+declare
+   is_employee boolean;
+begin
+    select exists(
+      select
+      from public.profiles p
+      left join public.user_relationships ur
+      on p.id = ur.employee_id
+      where p.id = uid
+      and ur.employee_id is not null
+    ) into is_employee;
+
+    return is_employee;
+end;
+$$;
